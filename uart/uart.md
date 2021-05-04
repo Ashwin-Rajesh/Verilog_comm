@@ -46,11 +46,11 @@ Source : Analog Devices [1]
 
 # Implementation
 
-### Transmission state machine
-![Transmit State machine](docs/uart_tx_sm.drawio.svg)
+## State machines
 
-### Receiver state machine
-![Receiver state machine](docs/uart_rx_sm.drawio.svg)
+Transmitter state machine | Receiver state machine
+:-:|:-:
+![Transmit State machine](docs/uart_tx_sm.drawio.svg) | ![Receiver state machine](docs/uart_rx_sm.drawio.svg)
 Created using draw.io
 ---
 
