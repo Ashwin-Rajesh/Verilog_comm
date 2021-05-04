@@ -13,3 +13,18 @@ Various digital communication protocol implementations in verilog, intended for 
 1) Icarus verilog for compilation
 2) GTKwave for visualization
 3) Draw.io for flowcharts
+
+---
+
+# Prefix notation
+
+This is the notation used (for the most part) as prefix for identifier names to indicate their type
+
+Prefix | Meaning
+:-----:|:-------:
+```i_```| Input port
+```o_```| Output port
+```p_```| Parameter (or localparam)
+```r_```| Register
+```w_```| Wire
+```s_```| Constant definitions (as localparam)
