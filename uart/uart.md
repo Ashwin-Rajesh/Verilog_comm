@@ -46,8 +46,12 @@ Source : Analog Devices [1]
 
 # Implementation
 
-![Transmit State machine](docs/uart_tx_sm.svg)
+### Transmission state machine
+![Transmit State machine](docs/uart_tx_sm.drawio.svg)
 
+### Receiver state machine
+![Receiver state machine](docs/uart_rx_sm.drawio.svg)
+Created using draw.io
 ---
 
 # Result
