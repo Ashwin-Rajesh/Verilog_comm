@@ -55,7 +55,7 @@ p_WORD_LEN  | Length of word transmitted (or received)
 
 Calculate p_CLK_DIV as
 
-$ p_CLK_DIV = /frac{System clock speed}{Baud rate} $
+``` p_CLK_DIV = (System clock speed) / (Baud rate) ```
 
 ## Interfaces
 
