@@ -89,6 +89,10 @@ Transmitter state machine | Receiver state machine
 
 Created using draw.io
 
+## Block diagram
+
+![UART Block diagram](docs/uart_blocks.drawio.svg)
+
 ---
 
 # Result
