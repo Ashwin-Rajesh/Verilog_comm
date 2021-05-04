@@ -46,12 +46,49 @@ Source : Analog Devices [1]
 
 # Implementation
 
+## Parameters
+
+Parameter   | Function
+:----------:|:---------:
+p_CLK_DIV   | Clock division ratio
+p_WORD_LEN  | Length of word transmitted (or received)
+
+Calculate p_CLK_DIV as
+
+$ p_CLK_DIV = /frac{System clock speed}{Baud rate} $
+
+## Interfaces
+
+Note : prefix notation is in [README](../README.md)
+
+For receiver, 
+
+Name of port | Function
+:-----------:|:-----------:
+i_clk        | High frequency clock
+i_rx         | UART Rx pin
+o_data       | Data output bus
+o_dv         | Data output ready interrupt
+
+For transmitter,
+
+Name of port | Function
+:-----------:|:-----------:
+i_clk        | High frequency system clock
+i_dv         | Send message signal (active high)
+i_data       | Data input bus
+o_tx         | UART Tx pin
+o_done       | UART Finished transmission signal
+o_active     | UART sending signal
+
 ## State machines
 
 Transmitter state machine | Receiver state machine
 :-:|:-:
 ![Transmit State machine](docs/uart_tx_sm.drawio.svg) | ![Receiver state machine](docs/uart_rx_sm.drawio.svg)
+
 Created using draw.io
+
 ---
 
 # Result
