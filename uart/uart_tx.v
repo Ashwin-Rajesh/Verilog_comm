@@ -62,11 +62,11 @@ module uart_tx #(parameter p_CLK_DIV, parameter p_WORD_LEN = 8)
     reg[2:0]            r_status = 0;          
 
     // Paramters for state machine states
-    parameter s_IDLE    = 3'b000;
-    parameter s_START   = 3'b001;
-    parameter s_DATA    = 3'b010;
-    parameter s_STOP    = 3'b011;
-    parameter s_RESTART = 3'b100;
+    localparam s_IDLE    = 3'b000,
+            s_START   = 3'b001;
+            s_DATA    = 3'b010;
+            s_STOP    = 3'b011;
+            s_RESTART = 3'b100;
 
     always @(posedge i_clk) begin
         case(r_status)
