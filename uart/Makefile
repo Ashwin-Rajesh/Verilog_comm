@@ -24,7 +24,7 @@
 proj_name 	= uart
 
 # Source files used
-source 		= uart_control.v uart_rx.v uart_tx.v
+source 		= uart_rx.v uart_tx.v
 
 # Testbench code
 testbench	= $(proj_name)_tb.v
