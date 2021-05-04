@@ -50,6 +50,20 @@ Source : Analog Devices [1]
 
 ---
 
+# Result
+
+![UART waveform](docs/uart_waveform.png)
+
+Signal values :
+- ```000``` : Idle
+- ```001``` : Start bit
+- ```010``` : Data bit
+- ```011``` : Stop bit
+- ```100``` : Restart stage
+
+
+---
+
 # References
 
 1) [Analog Devices](https://www.analog.com/en/analog-dialogue/articles/uart-a-hardware-communication-protocol.html#:~:text=By%20definition%2C%20UART%20is%20a,going%20to%20the%20receiving%20end.)
