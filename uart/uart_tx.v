@@ -37,7 +37,7 @@ SOFTWARE.
 // o_tx     : Output tx line
 // 
 
-module uart_tx #(parameter p_CLK_DIV, parameter p_WORD_LEN = 8)
+module uart_tx
 (
     input           i_clk,
     input           i_dv,
@@ -47,8 +47,13 @@ module uart_tx #(parameter p_CLK_DIV, parameter p_WORD_LEN = 8)
     output reg      o_done,
     output reg      o_active
 );
-    parameter p_WORD_WIDTH = clog2(p_WORD_LEN);
-    parameter p_CLK_WIDTH  = clog2(p_CLK_DIV);
+    parameter 
+        p_CLK_DIV  = 104,
+        p_WORD_LEN = 8;
+    
+    localparam 
+        p_WORD_WIDTH = $clog2(p_WORD_LEN),
+        p_CLK_WIDTH  = $clog2(p_CLK_DIV);
 
     // Latches from i_data
     reg[p_WORD_LEN:0]   r_data = 0;            
@@ -62,11 +67,12 @@ module uart_tx #(parameter p_CLK_DIV, parameter p_WORD_LEN = 8)
     reg[2:0]            r_status = 0;          
 
     // Paramters for state machine states
-    localparam s_IDLE    = 3'b000,
-            s_START   = 3'b001;
-            s_DATA    = 3'b010;
-            s_STOP    = 3'b011;
-            s_RESTART = 3'b100;
+    localparam 
+        s_IDLE    = 3'b000,
+        s_START   = 3'b001,
+        s_DATA    = 3'b010,
+        s_STOP    = 3'b011,
+        s_RESTART = 3'b100;
 
     always @(posedge i_clk) begin
         case(r_status)
@@ -78,7 +84,7 @@ module uart_tx #(parameter p_CLK_DIV, parameter p_WORD_LEN = 8)
                 r_clk_count <= 0;
                 r_bit_count <= 0;
 
-                if(i_dv == 1'b1):begin
+                if(i_dv == 1'b1) begin
                     r_data      <= i_data;
                     r_status    <= s_START;
                 end
@@ -88,15 +94,15 @@ module uart_tx #(parameter p_CLK_DIV, parameter p_WORD_LEN = 8)
             
             // Send low for 1 baud period, then send data
             s_START: begin
-                o_tx        <= 1'b1;
+                o_tx        <= 1'b0;
                 
                 if(r_clk_count < p_CLK_DIV) begin
                     r_clk_count <= r_clk_count + 1;
-                    r_status    <= p_START;
+                    r_status    <= s_START;
                 end     
                 else begin
                     r_clk_count <= 0;
-                    r_status    <= p_DATA;
+                    r_status    <= s_DATA;
                 end
             end
 
@@ -128,14 +134,14 @@ module uart_tx #(parameter p_CLK_DIV, parameter p_WORD_LEN = 8)
 
                 if(r_clk_count < p_CLK_DIV) begin
                     r_clk_count <= r_clk_count + 1;
-                    r_status    <= r_STOP;
+                    r_status    <= s_STOP;
                 end
                 else begin
                     o_done      <= 1'b1;
                     o_active    <= 1'b0;
 
                     r_clk_count <= 0;
-                    r_status    <= r_RESTART;
+                    r_status    <= s_RESTART;
                 end
             end
             

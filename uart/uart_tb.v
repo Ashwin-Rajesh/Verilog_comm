@@ -22,12 +22,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-`include "uart_rx.v"
-`include "uart_tx.v"
+`timescale 1ns/1ns
 
-'`timescale 1ns, 100ps
-
-module uart_tb:
+module uart_tb;
 
     wire    w_signal;
     reg     r_clk;
@@ -40,7 +37,7 @@ module uart_tb:
     wire w_rx_dv;
     reg  r_tx_dv;
 
-    uart_tx tx_dut #(.p_CLK_DIV(104), .p_WORD_LEN(8)) (
+    uart_tx #(.p_CLK_DIV(104), .p_WORD_LEN(8)) tx_dut (
         .i_clk(r_clk),
         .i_dv(r_tx_dv),
         .i_data(r_tx_data),
@@ -50,7 +47,7 @@ module uart_tb:
         .o_active(w_tx_active)
     );
 
-    uart_rx rx_dut #(.p_CLK_DIV(104), .p_WORD_LEN(8)) (
+    uart_rx #(.p_CLK_DIV(104), .p_WORD_LEN(8)) rx_dut (
         .i_clk(r_clk),
         .i_rx(w_signal),
 
@@ -61,7 +58,17 @@ module uart_tb:
     initial begin
         $dumpfile("uart.vcd");
         $dumpvars(0, uart_tb);
+
+        r_clk       <= 0;
+        r_tx_data   <= 8'hEE;
+        
+        #10;
+        r_tx_dv     <= 1'b1;
+        #1;
+        r_tx_dv     <= 1'b0;
     end
 
-    always #0.5 r_clk = ~r_clk;
+    always #1 r_clk = ~r_clk;
+
+    initial #10000 $finish;
 endmodule;
