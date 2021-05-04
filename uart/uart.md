@@ -61,7 +61,6 @@ Signal values :
 - ```011``` : Stop bit
 - ```100``` : Restart stage
 
-
 ---
 
 # References
