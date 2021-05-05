@@ -33,27 +33,33 @@ module spi_master(
     output reg o_active,
     output reg [p_WORD_LEN-1:0] o_data
 );
+    // Parameters
     parameter 
         p_CLK_DIV  = 100,
         p_WORD_LEN = 8;
 
+    // Local parameters
     localparam
         p_BIT_LEN  = $clog2(p_WORD_LEN+1),
         p_CLK_LEN  = $clog2(p_CLK_DIV/2+1);
     
+    // State machine states
     localparam 
         s_IDLE = 1'b0,
         s_DATA = 1'b1;
 
+    // Keep count of clock and bits
     reg[p_CLK_LEN-1:0]  r_clk_count = 0;
     reg[p_BIT_LEN-1:0]  r_bit_count = 0;
 
+    // Internal data register and state machine state
     reg[p_WORD_LEN-1:0] r_data      = 0;
     reg                 r_state     = 0;
 
     always @(posedge i_clk) begin
         case(r_state)
         s_IDLE: begin
+            // Output the default values
             o_sclk          <= 1'b0;
             r_bit_count     <= 0;
             r_clk_count     <= 0;
