@@ -34,24 +34,24 @@ module spi_slave(
     output reg o_dv,
     output reg [p_WORD_LEN-1:0] o_data
 );
+    // Parameters
     parameter 
-        p_CLK_DIV  = 100,
         p_WORD_LEN = 8;
 
+    // Local parameters
     localparam
-        p_BIT_LEN  = $clog2(p_WORD_LEN+1),
-        p_CLK_LEN  = $clog2(p_CLK_DIV/2+1);
+        p_BIT_LEN  = $clog2(p_WORD_LEN+1);
     
+    // State machine states
     localparam 
         s_IDLE = 1'b0,
         s_DATA = 1'b1;
 
-    reg[p_CLK_LEN-1:0]  r_clk_count = 0;
-    reg[p_BIT_LEN-1:0]  r_bit_count = 0;
-
+    // Store data and state of state machine
     reg[p_WORD_LEN-1:0] r_data      = 0;
     reg                 r_state     = 0;
 
+    // To detect edges
     reg r_prevsclk   = 0;
 
     always @(posedge i_clk) begin
@@ -59,33 +59,38 @@ module spi_slave(
             s_IDLE: begin
                 o_dv    <= 1'b0;
 
+                // Latchind data from input port
                 if(i_dv == 1'b1) r_data <= i_data;
                 
+                // If selected, go to s_DATA state and output the MSB
                 if(i_ss == 1'b0) begin
                     o_miso      <= r_data[p_WORD_LEN-1]; 
                     r_state     <= s_DATA;   
                 end
+                // Else, output high impedance state
                 else
                     o_miso      <= 1'bz;
             end
 
             s_DATA: begin
+                // If slave select is disabled, change to s_IDLE and
+                //      latch the data to output port, and send interrupt
                 if(i_ss == 1'b1) begin
                     o_data      <= r_data;
                     o_dv        <= 1'b1;
                     r_state     <= s_IDLE;
                 end
-                else begin
+                // Else, check for clock edge
+                else
                     if(r_prevsclk == ~i_sclk)
                         if(i_sclk == 1'b1) begin
-                            // Rising edge
+                            // Rising edge - Shift register
                             r_data  <= {r_data[p_WORD_LEN-2:0], i_mosi};
                         end
                         else begin
-                            // Falling edge
+                            // Falling edge - Output MSB
                             o_miso  <= r_data[p_WORD_LEN-1];
                         end
-                end
             end
 
             default: begin
@@ -93,6 +98,7 @@ module spi_slave(
             end
         endcase
 
+        // Save current clock value
         r_prevsclk    <= i_sclk;
     end
 
