@@ -47,6 +47,13 @@ If we are short on pins, and since we know that the slaves use shift register, w
 ![SPI daisy chaining](./docs/spi_circuit_daisy_chaining.png)
 
 ---
+# Block diagram
+
+![Daisy block diagram](docs/spi_daisy_block.drawio.svg)
+
+# Results
+
+![Daisy chaining waveform](docs/spi_daisy_waveform.png)
 
 ---
 
