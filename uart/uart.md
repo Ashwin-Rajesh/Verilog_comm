@@ -78,7 +78,7 @@ For transmitter,
 Name of port | Function
 :-----------:|:-----------:
 i_clk        | High frequency system clock
-i_dv         | Send message signal (active high)
+i_send         | Send message signal (active high)
 i_data       | Data input bus
 o_tx         | UART Tx pin
 o_done       | UART Finished transmission signal

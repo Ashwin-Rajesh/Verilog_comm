@@ -30,7 +30,7 @@ SOFTWARE.
 
 // Inputs :
 // i_clk    : Clock signal
-// i_dv     : Enable signal (active HIGH)
+// i_send     : Enable signal (active HIGH)
 // i_data   : 9-bit data line
 
 // Outputs :
@@ -40,7 +40,7 @@ SOFTWARE.
 module uart_tx
 (
     input           i_clk,
-    input           i_dv,
+    input           i_send,
     input [p_WORD_LEN:0]     i_data,
 
     output reg      o_tx,
@@ -84,8 +84,9 @@ module uart_tx
                 r_clk_count <= 0;
                 r_bit_count <= 0;
 
-                if(i_dv == 1'b1) begin
+                if(i_send == 1'b1) begin
                     r_data      <= i_data;
+                    o_active    <= 1'b1;
                     r_status    <= s_START;
                 end
                 else

@@ -39,7 +39,7 @@ module uart_tb;
 
     uart_tx #(.p_CLK_DIV(10), .p_WORD_LEN(8)) tx_dut (
         .i_clk(r_clk),
-        .i_dv(r_tx_dv),
+        .i_send(r_tx_dv),
         .i_data(r_tx_data),
         
         .o_tx(w_signal),
