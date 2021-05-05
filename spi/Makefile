@@ -47,6 +47,12 @@ $(object): $(source) $(testbench)
 $(wave): $(object) $(data)
 	./$(object)
 
+spi_daisy.out: $(source) spi_daisy.v
+	iverilog spi_daisy.v $(source) -o spi_daisy.out
+
+spi_daisy.vcd: spi_daisy.out
+	./spi_daisy.out
+
 view: $(wave)
 	gtkwave $(wave)
 .PHONY: simulate
@@ -54,3 +60,6 @@ view: $(wave)
 run: $(object)
 	./$(object)
 .PHONY:run
+
+daisy: spi_daisy.vcd
+	gtkwave spi_daisy.vcd
