@@ -67,7 +67,7 @@ module spi_tb;
         .o_data(w_m_odata)
     );
 
-    spi_slave #(.p_WORD_LEN(p_WORD_LEN), .p_CLK_DIV(p_CLK_DIV)) slave1_dut(
+    spi_slave #(.p_WORD_LEN(p_WORD_LEN)) slave1_dut(
         .i_clk(r_clk),
         .i_data(r_s1_idata),
         .i_dv(r_s1_idv),
@@ -80,7 +80,7 @@ module spi_tb;
         .o_data(w_s1_odata)
     );
 
-    spi_slave #(.p_WORD_LEN(p_WORD_LEN), .p_CLK_DIV(p_CLK_DIV)) slave2_dut(
+    spi_slave #(.p_WORD_LEN(p_WORD_LEN)) slave2_dut(
         .i_clk(r_clk),
         .i_data(r_s2_idata),
         .i_dv(r_s2_idv),
