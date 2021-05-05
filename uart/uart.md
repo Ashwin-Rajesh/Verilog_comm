@@ -7,14 +7,15 @@
 - Serial
 - Full duplex
 - Asynchronous
+- No master or slave
 
 # Popular uses
 - For communication between microcontrollers
 - For communication between microcontrollers and a computer (for debugging or sending commands)
 
 # Interface
- ![](./docs/uart_interface.svg)
-Source : Analog Devices [1]
+
+ ![](./docs/uart_circuit.png)
 
 - 2 pins, Rx and Tx are used.
   - Rx : Read
@@ -22,7 +23,7 @@ Source : Analog Devices [1]
 - A baud rate has to be set before-hand in both devices, because there is no clock signal.
 - Standard baud rates are :
   - 9600, 19200, 38400, 57600, 115200, 230400, 460800, 921600, 1000000, 1500000
-- Default voltage level is HIGH
+- Default voltage level (when inactive) is HIGH
 
 # Protocol
 
@@ -46,18 +47,20 @@ Source : Analog Devices [1]
 
 # Implementation
 
-## Parameters
+# Parameters
 
 Parameter   | Function
 :----------:|:---------:
 p_CLK_DIV   | Clock division ratio
 p_WORD_LEN  | Length of word transmitted (or received)
 
+Note : The parity bit is included in the length. The controller must set the parity bit like a normal bit. The tx or rx circuits does not include the parity bit.
+
 Calculate p_CLK_DIV as
 
 ``` p_CLK_DIV = (System clock speed) / (Baud rate) ```
 
-## Interfaces
+# Interfaces
 
 Note : prefix notation is in [README](../README.md)
 
@@ -68,7 +71,7 @@ Name of port | Function
 i_clk        | High frequency clock
 i_rx         | UART Rx pin
 o_data       | Data output bus
-o_dv         | Data output ready interrupt
+o_ready      | Data output ready interrupt
 
 For transmitter,
 
@@ -81,7 +84,7 @@ o_tx         | UART Tx pin
 o_done       | UART Finished transmission signal
 o_active     | UART sending signal
 
-## State machines
+# State machines
 
 Transmitter state machine | Receiver state machine
 :-:|:-:
@@ -89,7 +92,7 @@ Transmitter state machine | Receiver state machine
 
 Created using draw.io
 
-## Block diagram
+# Block diagram
 
 ![UART Block diagram](docs/uart_blocks.drawio.svg)
 
@@ -112,3 +115,4 @@ Signal values :
 
 1) [Analog Devices](https://www.analog.com/en/analog-dialogue/articles/uart-a-hardware-communication-protocol.html#:~:text=By%20definition%2C%20UART%20is%20a,going%20to%20the%20receiving%20end.)
 2) [NandLand implementation](https://www.nandland.com/vhdl/modules/module-uart-serial-port-rs232.html)
+

@@ -37,7 +37,7 @@ module uart_tb;
     wire w_rx_dv;
     reg  r_tx_dv;
 
-    uart_tx #(.p_CLK_DIV(104), .p_WORD_LEN(8)) tx_dut (
+    uart_tx #(.p_CLK_DIV(10), .p_WORD_LEN(8)) tx_dut (
         .i_clk(r_clk),
         .i_dv(r_tx_dv),
         .i_data(r_tx_data),
@@ -47,12 +47,12 @@ module uart_tb;
         .o_active(w_tx_active)
     );
 
-    uart_rx #(.p_CLK_DIV(104), .p_WORD_LEN(8)) rx_dut (
+    uart_rx #(.p_CLK_DIV(10), .p_WORD_LEN(8)) rx_dut (
         .i_clk(r_clk),
         .i_rx(w_signal),
 
         .o_data(w_rx_data),
-        .o_dv(w_rx_dv)
+        .o_ready(w_rx_dv)
     );
 
     initial begin

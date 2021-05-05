@@ -44,7 +44,7 @@ module uart_rx
     input           i_rx,
     
     output reg [p_WORD_LEN:0] o_data,
-    output reg      o_dv
+    output reg      o_ready
 );
     parameter
         p_CLK_DIV  = 104,
@@ -76,7 +76,7 @@ module uart_rx
     always @(posedge i_clk) begin
         case(r_status)
             s_IDLE: begin
-                o_dv        <= 1'b0;
+                o_ready        <= 1'b0;
                 r_clk_count <= 0;
                 r_bit_count <= 0;
 
@@ -131,7 +131,7 @@ module uart_rx
                     r_status    <= s_STOP;
                 end
                 else begin
-                    o_dv = 1'b1;
+                    o_ready = 1'b1;
 
                     r_clk_count <= 0;
                     r_status    <= s_RESTART;
@@ -140,7 +140,7 @@ module uart_rx
             
             // Send o_done for one internal clock cycle
             s_RESTART: begin
-                o_dv        <= 1'b0;
+                o_ready        <= 1'b0;
                 r_status    <= s_IDLE;
             end
             
