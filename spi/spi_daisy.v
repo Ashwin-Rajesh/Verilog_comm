@@ -101,11 +101,22 @@ module spi_daisy;
     assign w_s2_mosi = w_s1_miso;
 
     assign w_m_miso  = w_s2_miso;
-    
+
     initial begin
         $dumpfile("spi_daisy.vcd");
         $dumpvars(0, spi_daisy);
         
+        r_s1_idata  <= 8'b00000000;
+        r_s2_idata  <= 8'b01010101;
+
+        // Latch data from both slaves
+        #1
+        r_s1_idv    <= 1'b1;
+        r_s2_idv    <= 1'b1;
+        #5
+        r_s1_idv    <= 1'b0;
+        r_s2_idv    <= 1'b0;
+
         // Enable both slaves
         #5
         r_ss        <= 1'b0;
@@ -122,7 +133,7 @@ module spi_daisy;
 
         // Signal master to send second word
         #5
-        r_m_idata   <= 8'b01010101;
+        r_m_idata   <= 8'b11111111;
         #5
         r_m_dv      <= 1'b1;
         #5
