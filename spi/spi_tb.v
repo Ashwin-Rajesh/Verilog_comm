@@ -33,16 +33,27 @@ module spi_tb;
     reg                     r_m_dv = 0;
     wire [p_WORD_LEN-1:0]   w_m_odata;
 
-    reg[p_WORD_LEN-1:0]     r_s_idata = 0;
-    reg                     r_s_idv = 0;
-    wire                    w_s_odv;
-    wire[p_WORD_LEN-1:0]    w_s_odata;
+    // Slave 1 interface
+    reg[p_WORD_LEN-1:0]     r_s1_idata = 0;
+    reg                     r_s1_idv = 0;
+    wire                    w_s1_odv;
+    wire[p_WORD_LEN-1:0]    w_s1_odata;
+
+    reg r_s1s = 1;
+
+    // Slave 2 interface
+    reg[p_WORD_LEN-1:0]     r_s2_idata = 0;
+    reg                     r_s2_idv = 0;
+    wire                    w_s2_odv;
+    wire[p_WORD_LEN-1:0]    w_s2_odata;
+
+    reg r_s2s = 1;
+
 
     wire w_sclk;
     wire w_mosi;
     wire w_miso;
 
-    reg r_ss = 1;
 
     spi_master #(.p_WORD_LEN(p_WORD_LEN), .p_CLK_DIV(p_CLK_DIV)) master_dut(
         .i_clk(r_clk),
@@ -56,40 +67,73 @@ module spi_tb;
         .o_data(w_m_odata)
     );
 
-    spi_slave #(.p_WORD_LEN(p_WORD_LEN), .p_CLK_DIV(p_CLK_DIV)) slave_dut(
+    spi_slave #(.p_WORD_LEN(p_WORD_LEN), .p_CLK_DIV(p_CLK_DIV)) slave1_dut(
         .i_clk(r_clk),
-        .i_data(r_s_idata),
-        .i_dv(r_s_idv),
+        .i_data(r_s1_idata),
+        .i_dv(r_s1_idv),
         .i_sclk(w_sclk),
         .i_mosi(w_mosi),
-        .i_ss(r_ss),
+        .i_ss(r_s1s),
 
         .o_miso(w_miso),
-        .o_dv(w_s_odv),
-        .o_data(w_s_odata)
+        .o_dv(w_s1_odv),
+        .o_data(w_s1_odata)
     );
 
+    spi_slave #(.p_WORD_LEN(p_WORD_LEN), .p_CLK_DIV(p_CLK_DIV)) slave2_dut(
+        .i_clk(r_clk),
+        .i_data(r_s2_idata),
+        .i_dv(r_s2_idv),
+        .i_sclk(w_sclk),
+        .i_mosi(w_mosi),
+        .i_ss(r_s2s),
+
+        .o_miso(w_miso),
+        .o_dv(w_s2_odv),
+        .o_data(w_s2_odata)
+    );
 
     initial begin
         $dumpfile("spi.vcd");
         $dumpvars(0, spi_tb);
-    
+
         r_m_idata <= 8'b11110000;
-        r_s_idata <= 8'b01101001;
+        r_s1_idata <= 8'b01101001;
+        r_s2_idata <= 8'b00001111;
 
         // Latch slave data
         #1
-        r_s_idv     <= 1'b1;
+        r_s1_idv     <= 1'b1;
+        r_s2_idv     <= 1'b1;
         #5;
+        r_s1_idv     <= 1'b0;
+        r_s2_idv     <= 1'b0;
         
-        r_ss        <= 1'b0;
+        // Enable slave 1
+        r_s1s        <= 1'b0;
+        // Signal to master send data
         #5;
         r_m_dv      <= 1'b1;
         #5
         r_m_dv      <= 1'b0;
-
+        // Disable slave 1
         #300;
-        r_ss        <= 1'b1;
+        r_s1s        <= 1'b1;
+
+        // Change master input to be master output
+        r_m_idata    <= w_m_odata;
+
+        // Enable slave 2
+        #5;
+        r_s2s        <= 1'b0;
+        // Signal to master send data
+        #5;
+        r_m_dv      <= 1'b1;
+        #5
+        r_m_dv      <= 1'b0;
+        // Disable slave 1
+        #300;
+        r_s2s        <= 1'b1;
     end
 
     always #1 r_clk <= ~r_clk;
