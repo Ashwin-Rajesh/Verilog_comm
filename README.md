@@ -27,4 +27,4 @@ Prefix | Meaning
 ```p_```| Parameter (or localparam)
 ```r_```| Register
 ```w_```| Wire
-```s_```| Constant definitions (as localparam)
+```s_```| State definitions (as localparam)
