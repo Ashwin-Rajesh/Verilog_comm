@@ -41,7 +41,7 @@ module uart_tx
 (
     input           i_clk,
     input           i_send,
-    input [p_WORD_LEN:0]     i_data,
+    input [p_WORD_LEN-1:0]     i_data,
 
     output reg      o_tx,
     output reg      o_done,
@@ -52,16 +52,16 @@ module uart_tx
         p_WORD_LEN = 8;
     
     localparam 
-        p_WORD_WIDTH = $clog2(p_WORD_LEN),
-        p_CLK_WIDTH  = $clog2(p_CLK_DIV);
+        p_WORD_WIDTH = $clog2(p_WORD_LEN+1),
+        p_CLK_WIDTH  = $clog2(p_CLK_DIV+1);
 
     // Latches from i_data
-    reg[p_WORD_LEN:0]   r_data = 0;            
+    reg[p_WORD_LEN-1:0]   r_data = 0;            
 
     // Store clock count (for synchronization)
-    reg[p_CLK_WIDTH:0]  r_clk_count = 0;       
+    reg[p_CLK_WIDTH-1:0]  r_clk_count = 0;       
     // Store bit currently being sent
-    reg[p_WORD_WIDTH:0] r_bit_count = 0;       
+    reg[p_WORD_WIDTH-1:0] r_bit_count = 0;       
     
     // Store state machine state
     reg[2:0]            r_status = 0;          

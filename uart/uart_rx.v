@@ -43,7 +43,7 @@ module uart_rx
     input           i_clk,
     input           i_rx,
     
-    output reg [p_WORD_LEN:0] o_data,
+    output reg [p_WORD_LEN-1:0] o_data,
     output reg      o_ready
 );
     parameter
@@ -51,16 +51,16 @@ module uart_rx
         p_WORD_LEN = 8;
     
     localparam 
-        p_WORD_WIDTH = $clog2(p_WORD_LEN),
-        p_CLK_WIDTH  = $clog2(p_CLK_DIV);
+        p_WORD_WIDTH = $clog2(p_WORD_LEN+1),
+        p_CLK_WIDTH  = $clog2(p_CLK_DIV+1);
 
     // Latches from i_data
-    reg[p_WORD_LEN:0]   r_data = 0;            
+    reg[p_WORD_LEN-1:0]   r_data = 0;            
 
     // Store clock count (for synchronization)
-    reg[p_CLK_WIDTH:0]  r_clk_count = 0;       
+    reg[p_CLK_WIDTH-1:0]  r_clk_count = 0;       
     // Store bit currently being received
-    reg[p_WORD_WIDTH:0] r_bit_count = 0;       
+    reg[p_WORD_WIDTH-1:0] r_bit_count = 0;       
     
     // Store state machine state
     reg[2:0]            r_status = 0;          
@@ -88,7 +88,7 @@ module uart_rx
             
             // Check after half period for low
             s_START: begin                
-                if(r_clk_count < (p_CLK_DIV - 1)/2) begin
+                if(r_clk_count < p_CLK_DIV/2) begin
                     r_clk_count <= r_clk_count + 1;
                     r_status    <= s_START;
                 end     
