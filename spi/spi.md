@@ -20,24 +20,16 @@
     - Data is sample on the rising edge of clock
 - 2 data pins
   - ```MOSI```    : Master Out Slave In
-    - MSB first
   - ```MISO```    : Master In Slave Out
-    - LSB first
 - Select pins for each slave
   - ```SS```      : Slave select (Active ```LOW```)
 - Any number of bits can be sent or received - no concept of packets
 
 Often, peripheral devices call MOSI as SDI (Serial Data In) and MISO as SDO (Serial Data Out), and Slave select as CS (Chip Select)
 
+Note : Most of the time, chip select is not a part of the SPI hardware interface and is controlled using other GPIO pins.
+
 # Protocol
-
-Master In Slave Out
-![](./docs/spi_miso.png)
-
-Master Out Slave In
-![](./docs/spi_mosi.png)
-
-Both of these can happen simultaneously. 
 
 The SPI protocol is implemented using shift registers.
 
@@ -64,4 +56,5 @@ If we are short on pins, and since we know that the slaves use shift register, w
 2) [MaximIntegrated](https://www.maximintegrated.com/en/design/technical-documents/app-notes/3/3947.html)
 3) [ADXL345 Accelerometer](https://www.analog.com/media/en/technical-documentation/data-sheets/ADXL345.pdf)
 4) [MAX5295 DAC](https://datasheets.maximintegrated.com/en/ds/MAX5290-MAX5295.pdf)
-5) 
+5) [AnalogDevices](https://www.analog.com/en/analog-dialogue/articles/introduction-to-spi-interface.html)
+   
