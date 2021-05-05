@@ -49,6 +49,8 @@ If we are short on pins, and since we know that the slaves use shift register, w
 ---
 # Block diagram
 
+![Testbench block diagram](docs/spi_block.drawio.svg)
+
 ![Daisy block diagram](docs/spi_daisy_block.drawio.svg)
 
 # Results
