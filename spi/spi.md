@@ -39,22 +39,22 @@ Master Out Slave In
 
 Both of these can happen simultaneously. 
 
-Quite often (not always), the SPI protocol is implemented using shift registers. For example, MAX5290 DACs have these shift registers. But, ADXL345 accelerometers do not have these.
+The SPI protocol is implemented using shift registers.
 
 ![](./docs/spi_ringbuff.png)
 
-So, the SPI protocol acts like a ring buffer in this case.
+So, the SPI protocol acts like a ring buffer in this case. The slave buffer is read by the controller when CS pin goes high.
 
 # Multiple slaves and daisy chaining
 
 Using multiple slaves with seperate slave select pins
 ![SPI multiple slaves](./docs/spi_circuit_multiple_slaves.png)
 
-If we are short on pins, and we know that the slaves use shift register, we can use "daisy chaining" with a single pin.
+If we are short on pins, and since we know that the slaves use shift register, we can use "daisy chaining" with a single pin. The shift register values are only read when CS pin goes high. So, in the case below, we can maintain CS pin low for transferring 3 words which are shifted over one-by-one. We need to send the word to the last slave in the chain first.
+
 ![SPI daisy chaining](./docs/spi_circuit_daisy_chaining.png)
 
 ---
-
 
 ---
 
