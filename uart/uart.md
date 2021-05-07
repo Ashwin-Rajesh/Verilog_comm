@@ -109,6 +109,10 @@ Signal values :
 - ```011``` : Stop bit
 - ```100``` : Restart stage
 
+The output was tested with the string "Hello world" and analyzed using pulseview
+
+![UART pulseview alaysis screenshot](docs/uart_pulseview.png)
+
 ---
 
 # References
