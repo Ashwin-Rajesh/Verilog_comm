@@ -22,24 +22,29 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-`timescale 1ns/1ns
+`timescale 1us/1us
 
 module uart_tb;
 
     wire    w_signal;
-    reg     r_clk;
+    reg     r_clk           = 0;
     
-    reg[7:0]    r_tx_data;
+    reg[7:0]    r_tx_data   = 0;
     wire[7:0]   w_rx_data;
 
     wire w_tx_done;
     wire w_tx_active;
-    wire w_rx_dv;
-    reg  r_tx_dv;
+    wire w_rx_ready;
+    reg  r_tx_send          = 0;
 
-    uart_tx #(.p_CLK_DIV(10), .p_WORD_LEN(8)) tx_dut (
+    // The clock generated is 0.5GHz
+    // To get 9600Hz baud rate,
+    // p_CLK_DIV = 0.5MHz/9.6MHz = 52.08
+    localparam p_CLK_DIV = 52;
+
+    uart_tx #(.p_CLK_DIV(p_CLK_DIV), .p_WORD_LEN(8)) tx_dut (
         .i_clk(r_clk),
-        .i_send(r_tx_dv),
+        .i_send(r_tx_send),
         .i_data(r_tx_data),
         
         .o_tx(w_signal),
@@ -47,28 +52,37 @@ module uart_tb;
         .o_active(w_tx_active)
     );
 
-    uart_rx #(.p_CLK_DIV(10), .p_WORD_LEN(8)) rx_dut (
+    uart_rx #(.p_CLK_DIV(p_CLK_DIV), .p_WORD_LEN(8)) rx_dut (
         .i_clk(r_clk),
         .i_rx(w_signal),
 
         .o_data(w_rx_data),
-        .o_ready(w_rx_dv)
+        .o_ready(w_rx_ready)
     );
+
+    localparam p_STR_LEN = 15;
+
+    reg[8*p_STR_LEN-1:0] r_input_string = "Hello world";
+
+    integer r_stridx = 0;
 
     initial begin
         $dumpfile("uart.vcd");
-        $dumpvars(0, uart_tb);
+        $dumpvars(0, uart_tb);        
 
-        r_clk       <= 0;
-        r_tx_data   <= 8'hEE;
-        
-        #10;
-        r_tx_dv     <= 1'b1;
-        #1;
-        r_tx_dv     <= 1'b0;
+        #1000;
+
+        for(r_stridx = 0; r_stridx < p_STR_LEN; r_stridx = r_stridx + 1) begin
+            #1  r_tx_send <= 1'b1;
+            #2  r_tx_send <= 1'b0;
+
+            @(negedge w_tx_done) #10
+            r_tx_data     <= r_input_string[r_stridx * 8 +: 8];
+            #1000;
+        end
+
+        #100 $finish;
     end
 
     always #1 r_clk = ~r_clk;
-
-    initial #10000 $finish;
 endmodule;

@@ -45,7 +45,7 @@ module uart_tx
 
     output reg      o_tx,
     output reg      o_done,
-    output reg      o_active
+    output reg      o_active 
 );
     parameter 
         p_CLK_DIV  = 104,
@@ -97,7 +97,7 @@ module uart_tx
             s_START: begin
                 o_tx        <= 1'b0;
                 
-                if(r_clk_count < p_CLK_DIV) begin
+                if(r_clk_count < p_CLK_DIV - 1) begin
                     r_clk_count <= r_clk_count + 1;
                     r_status    <= s_START;
                 end     
@@ -111,14 +111,14 @@ module uart_tx
             s_DATA: begin
                 o_tx        <= r_data[r_bit_count];
 
-                if(r_clk_count < p_CLK_DIV) begin
+                if(r_clk_count < p_CLK_DIV - 1) begin
                     r_clk_count <= r_clk_count + 1;
                     r_status    <= s_DATA;
                 end  
                 else begin
                     r_clk_count <= 0;
                     
-                    if(r_bit_count != p_WORD_LEN) begin
+                    if(r_bit_count < p_WORD_LEN - 1) begin
                         r_status    <= s_DATA;
                         r_bit_count <= r_bit_count + 1;
                     end
@@ -133,7 +133,7 @@ module uart_tx
             s_STOP: begin
                 o_tx        <= 1'b1;
 
-                if(r_clk_count < p_CLK_DIV) begin
+                if(r_clk_count < p_CLK_DIV - 1) begin
                     r_clk_count <= r_clk_count + 1;
                     r_status    <= s_STOP;
                 end

@@ -43,8 +43,8 @@ module uart_rx
     input           i_clk,
     input           i_rx,
     
-    output reg [p_WORD_LEN-1:0] o_data,
-    output reg      o_ready
+    output reg [p_WORD_LEN-1:0] o_data      = 0,
+    output reg      o_ready                 = 0
 );
     parameter
         p_CLK_DIV  = 104,
@@ -88,7 +88,7 @@ module uart_rx
             
             // Check after half period for low
             s_START: begin                
-                if(r_clk_count < p_CLK_DIV/2) begin
+                if(r_clk_count < p_CLK_DIV/2 - 1) begin
                     r_clk_count <= r_clk_count + 1;
                     r_status    <= s_START;
                 end     
@@ -104,7 +104,7 @@ module uart_rx
 
             // Receive data bits
             s_DATA: begin
-                if(r_clk_count < p_CLK_DIV) begin
+                if(r_clk_count < p_CLK_DIV - 1) begin
                     r_clk_count <= r_clk_count + 1;
                     r_status    <= s_DATA;
                 end
