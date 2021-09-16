@@ -23,16 +23,21 @@ SOFTWARE.
 */
 
 module spi_slave(
+    // General signals
     input i_clk,
-    input[p_WORD_LEN-1:0] i_data,
-    input i_dv,
     input i_sclk,
     input i_mosi,
     input i_ss,
+    output reg o_miso                       = 1'b0,
 
-    output reg o_miso,
-    output reg o_dv,
-    output reg [p_WORD_LEN-1:0] o_data
+    // Input method
+    input[p_WORD_LEN-1:0] inp_data,
+    input inp_en,
+    output inp_rdy,
+
+    // Output method
+    output reg [p_WORD_LEN-1:0] out_data    = 0,
+    output out_rdy
 );
     // Parameters
     parameter 
@@ -54,13 +59,16 @@ module spi_slave(
     // To detect edges
     reg r_prevsclk   = 0;
 
+    // Is the system ready?
+    assign inp_rdy = r_state == s_IDLE;
+    assign out_rdy = r_state == s_IDLE;
+
     always @(posedge i_clk) begin
         case(r_state)
             s_IDLE: begin
-                o_dv    <= 1'b0;
-
-                // Latchind data from input port
-                if(i_dv == 1'b1) r_data <= i_data;
+            
+                // Latching data from input port
+                if(inp_en == 1'b1) r_data <= inp_data;
                 
                 // If selected, go to s_DATA state and output the MSB
                 if(i_ss == 1'b0) begin
@@ -76,9 +84,9 @@ module spi_slave(
                 // If slave select is disabled, change to s_IDLE and
                 //      latch the data to output port, and send interrupt
                 if(i_ss == 1'b1) begin
-                    o_data      <= r_data;
-                    o_dv        <= 1'b1;
+                    out_data    <= r_data;
                     r_state     <= s_IDLE;
+                    o_miso      <= 1'bz;
                 end
                 // Else, check for clock edge
                 else

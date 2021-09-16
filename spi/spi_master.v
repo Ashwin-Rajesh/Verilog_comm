@@ -23,15 +23,20 @@ SOFTWARE.
 */
 
 module spi_master(
+    // General signals
     input i_clk,
-    input[p_WORD_LEN-1:0] i_data,
-    input i_dv,
     input i_miso,
+    output reg o_sclk                       = 1'b0,
+    output reg o_mosi                       = 1'b0,
 
-    output reg o_sclk,
-    output reg o_mosi,
-    output reg o_active,
-    output reg [p_WORD_LEN-1:0] o_data
+    // Input method
+    input[p_WORD_LEN-1:0] inp_data,
+    input inp_en,
+    output inp_rdy,
+
+    // Output method
+    output reg [p_WORD_LEN-1:0] out_data    = 0,
+    output out_rdy
 );
     // Parameters
     parameter 
@@ -56,6 +61,10 @@ module spi_master(
     reg[p_WORD_LEN-1:0] r_data      = 0;
     reg                 r_state     = 0;
 
+    // Is the system ready?
+    assign out_rdy = (r_state == s_IDLE);
+    assign inp_rdy  = (r_state == s_IDLE);
+
     always @(posedge i_clk) begin
         case(r_state)
         s_IDLE: begin
@@ -64,16 +73,14 @@ module spi_master(
             r_bit_count     <= 0;
             r_clk_count     <= 0;
 
-            if(i_dv == 1'b1) begin
+            if(inp_en == 1'b1) begin
                 r_state         <= s_DATA;
-                r_data          <= i_data;
-                o_mosi          <= i_data[p_WORD_LEN-1];
-                o_active        <= 1'b1;
+                r_data          <= inp_data;
+                o_mosi          <= inp_data[p_WORD_LEN-1];
             end 
             else begin
                 r_state         <= s_IDLE;
                 o_mosi          <= 1'b0;
-                o_active        <= 1'b0;
             end
         end
         
@@ -96,8 +103,7 @@ module spi_master(
                     end 
                 end
                 else begin
-                    o_active        <= 1'b0;                    
-                    o_data          <= r_data;
+                    out_data          <= r_data;
                     r_state         <= s_IDLE;
                 end
             end
