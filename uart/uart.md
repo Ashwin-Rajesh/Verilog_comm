@@ -67,22 +67,21 @@ Note : prefix notation is in [README](../README.md)
 For receiver, 
 
 Name of port | Function
-:-----------:|:-----------:
-i_clk        | High frequency clock
-i_rx         | UART Rx pin
-o_data       | Data output bus
-o_ready      | Data output ready interrupt
+:-------------------:|:-----------:
+i_clk                | High frequency clock
+i_rx                 | UART Rx pin
+o_receive_data       | Received data
+o_receive_ready      | Is received data valid?
 
 For transmitter,
 
 Name of port | Function
 :-----------:|:-----------:
 i_clk        | High frequency system clock
-i_send         | Send message signal (active high)
-i_data       | Data input bus
+i_send_en    | Enable send operation
+i_send_data  | Data to be sent
 o_tx         | UART Tx pin
-o_done       | UART Finished transmission signal
-o_active     | UART sending signal
+o_send_rdy   | Is next data ready to be sent?
 
 # State machines
 
