@@ -30,21 +30,21 @@ SOFTWARE.
 
 // Inputs :
 // i_clk    : Clock signal
-// i_en     : Enable signal (active HIGH)
 // i_rx     : Input rx line
-// i_data   : 9-bit data line
 
-// Outputs :
-// o_tx     : Output tx line
-// 
+// Receive method - Ready is asserted when data is available to read.
+// o_receive_rdy    : Is it ready?
+// o_receive_data   : Received data
 
 module uart_rx
 (
     input           i_clk,
     input           i_rx,
-    
-    output reg [p_WORD_LEN-1:0] o_data      = 0,
-    output reg      o_ready                 = 0
+
+    // Receive enable, data and ready
+    output reg [p_WORD_LEN-1:0] 
+                    o_receive_data          = 0,
+    output reg      o_receive_rdy           = 0
 );
     parameter
         p_CLK_DIV  = 104,
@@ -76,14 +76,15 @@ module uart_rx
     always @(posedge i_clk) begin
         case(r_status)
             s_IDLE: begin
-                o_ready        <= 1'b0;
+                o_receive_rdy  <= 1'b1;
                 r_clk_count <= 0;
                 r_bit_count <= 0;
 
-                if(i_rx == 1'b0)
-                    r_status    <= s_START;
-                else
-                    r_status    <= s_IDLE;
+                if(i_rx == 1'b0) begin
+                    o_receive_rdy   <= 1'b0;
+                    r_status        <= s_START;
+                end else
+                    r_status        <= s_IDLE;
             end
             
             // Check after half period for low
@@ -117,7 +118,7 @@ module uart_rx
                         r_bit_count <= r_bit_count + 1;
                     end
                     else begin
-                        o_data      <= r_data;
+                        o_receive_data      <= r_data;
                         r_status    <= s_STOP;
                         r_bit_count <= 0;
                     end
@@ -131,8 +132,6 @@ module uart_rx
                     r_status    <= s_STOP;
                 end
                 else begin
-                    o_ready = 1'b1;
-
                     r_clk_count <= 0;
                     r_status    <= s_RESTART;
                 end
@@ -140,7 +139,7 @@ module uart_rx
             
             // Send o_done for one internal clock cycle
             s_RESTART: begin
-                o_ready        <= 1'b0;
+                o_receive_rdy  <= 1'b0;
                 r_status    <= s_IDLE;
             end
             

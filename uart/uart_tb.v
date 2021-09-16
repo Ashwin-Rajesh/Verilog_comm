@@ -24,6 +24,9 @@ SOFTWARE.
 
 `timescale 1us/1us
 
+// `include "uart_rx_v2.v"
+// `include "uart_tx_v2.v"
+
 module uart_tb;
 
     wire    w_signal;
@@ -33,7 +36,7 @@ module uart_tb;
     wire[7:0]   w_rx_data;
 
     wire w_tx_done;
-    wire w_tx_active;
+    wire w_tx_ready;
     wire w_rx_ready;
     reg  r_tx_send          = 0;
 
@@ -42,22 +45,23 @@ module uart_tb;
     // p_CLK_DIV = 0.5MHz/9.6MHz = 52.08
     localparam p_CLK_DIV = 52;
 
-    uart_tx #(.p_CLK_DIV(p_CLK_DIV), .p_WORD_LEN(8)) tx_dut (
+    uart_tx #(.p_CLK_DIV(p_CLK_DIV), .p_WORD_LEN(8)) tx_dut (        
         .i_clk(r_clk),
-        .i_send(r_tx_send),
-        .i_data(r_tx_data),
-        
-        .o_tx(w_signal),
-        .o_done(w_tx_done),
-        .o_active(w_tx_active)
+        .o_tx(w_signal),       // Output UART signal
+
+        // Send enable , data and ready
+        .i_send_en(r_tx_send),
+        .i_send_data(r_tx_data),
+        .o_send_rdy(w_tx_ready)
     );
 
     uart_rx #(.p_CLK_DIV(p_CLK_DIV), .p_WORD_LEN(8)) rx_dut (
         .i_clk(r_clk),
-        .i_rx(w_signal),
+        .i_rx(w_signal),        // Input UART signal
 
-        .o_data(w_rx_data),
-        .o_ready(w_rx_ready)
+        // Receive enable, data and ready
+        .o_receive_data(w_rx_data),
+        .o_receive_rdy(w_rx_ready)    
     );
 
     localparam p_STR_LEN = 15;
@@ -76,13 +80,13 @@ module uart_tb;
             #1  r_tx_send <= 1'b1;
             #2  r_tx_send <= 1'b0;
 
-            @(negedge w_tx_done) #10
+            @(posedge w_tx_ready) #10
             r_tx_data     <= r_input_string[r_stridx * 8 +: 8];
             #1000;
         end
 
         #100 $finish;
     end
-
+    
     always #1 r_clk = ~r_clk;
 endmodule;

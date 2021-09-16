@@ -39,14 +39,15 @@ SOFTWARE.
 
 module uart_tx
 (
-    input           i_clk,
-    input           i_send,
-    input [p_WORD_LEN-1:0]     i_data,
+    input                   i_clk,
+    output reg              o_tx,       // Output signal
 
-    output reg      o_tx,
-    output reg      o_done,
-    output reg      o_active 
+    // Send enable , data and ready
+    input                   i_send_en,
+    input [p_WORD_LEN-1:0]  i_send_data,
+    output                  o_send_rdy
 );
+
     parameter 
         p_CLK_DIV  = 104,
         p_WORD_LEN = 8;
@@ -55,7 +56,7 @@ module uart_tx
         p_WORD_WIDTH = $clog2(p_WORD_LEN+1),
         p_CLK_WIDTH  = $clog2(p_CLK_DIV+1);
 
-    // Latches from i_data
+    // Latches from i_send_data
     reg[p_WORD_LEN-1:0]   r_data = 0;            
 
     // Store clock count (for synchronization)
@@ -71,22 +72,20 @@ module uart_tx
         s_IDLE    = 3'b000,
         s_START   = 3'b001,
         s_DATA    = 3'b010,
-        s_STOP    = 3'b011,
-        s_RESTART = 3'b100;
+        s_STOP    = 3'b011;
+
+    assign o_send_rdy = (r_status == s_IDLE);
 
     always @(posedge i_clk) begin
         case(r_status)
             s_IDLE: begin
                 o_tx        <= 1'b1;
-                o_done      <= 1'b0;
-                o_active    <= 1'b0;
 
                 r_clk_count <= 0;
                 r_bit_count <= 0;
 
-                if(i_send == 1'b1) begin
-                    r_data      <= i_data;
-                    o_active    <= 1'b1;
+                if(i_send_en == 1'b1) begin
+                    r_data      <= i_send_data;
                     r_status    <= s_START;
                 end
                 else
@@ -138,18 +137,10 @@ module uart_tx
                     r_status    <= s_STOP;
                 end
                 else begin
-                    o_done      <= 1'b1;
-                    o_active    <= 1'b0;
 
                     r_clk_count <= 0;
-                    r_status    <= s_RESTART;
+                    r_status    <= s_IDLE;
                 end
-            end
-            
-            // Send o_done for one internal clock cycle
-            s_RESTART: begin
-                o_done      <= 1'b1;
-                r_status    <= s_IDLE;
             end
 
             default:
