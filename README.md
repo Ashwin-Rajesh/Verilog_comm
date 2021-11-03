@@ -7,6 +7,8 @@ Implementation of common digital communication protocols in verilog, for use in 
 # Index
 1) [UART (Universal Asynchronous Receiver/Transmitter)](uart/uart.md)
 2) [SPI (Serial Peripheral Interconnect)](spi/spi.md)
+3) [CRC (Cyclic redundance check)](crc/crc.md)
+4) [I2C (Inter-IC)](i2c/i2c.md)
 
 ---
 
