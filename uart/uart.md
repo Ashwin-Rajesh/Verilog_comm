@@ -99,9 +99,13 @@ Created using draw.io
 
 # Result
 
-![UART waveform](docs/uart_waveform.png)
+1) Larger timescale (multiple bytes transmitted)
+![UART large waveform](docs/uart_wave_large.png)
 
-Signal values :
+1) Lower timescale (single byte)
+![UART waveform](docs/uart_wave.png)
+
+Status values :
 - ```000``` : Idle
 - ```001``` : Start bit
 - ```010``` : Data bit
