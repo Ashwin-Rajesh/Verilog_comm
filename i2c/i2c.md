@@ -34,24 +34,70 @@
 
 # Master core
 
-## FSM
+## Finite state machine
+
 - The core of the I2C IP works using a finite state machine. This is its state transition diagram. It is a moore machine (almost). SDA and SCL depends on the state it is in, but SDA can also be dependent on address/data that is being sent.
+
+States
+
+| Name            | Number | Description | SDA | SCL |
+|-----------------|--------|-------------|-----|-----|
+| s_IDLE          | 0      | Bus idle    | 1   | 1   |
+| s_START         | 1      | Start bit   | 0   | 1   |
+| s_W_SCL_HIGH    | 2      | Write bit   | x   | 1   |
+| s_W_SCL_LOW     | 3      | Write bit   | x   | 0   |
+| s_RACK_SCL_LOW  | 4      | Read ack    | z   | 0   |
+| s_RACK_SCL_HIGH | 5      | Read ack    | z   | 1   |
+| s_R_SCL_HIGH    | 6      | Read bit    | z   | 1   |
+| s_R_SCL_LOW     | 7      | Read bit    | z   | 0   |
+| s_WACK_SCL_LOW  | 8      | Write ack   | 0   | 0   |
+| s_WACK_SCL_HIGH | 9      | Write ack   | 0   | 1   |
+| s_STOP          | 10     | Stop bit    | 0   | 1   |
+
+- Start condition is on transition from ```s_IDLE``` to ```s_START```
+- Stop condition is on transition from ```s_STOP``` to ```s_IDLE```
 
 ![](docs/i2c_master_fsm.drawio.svg)
 
-There are 2 tracks, one for sending and one fore receiving. There is a bit counter which counts from 0 to 7. For writing, we load the value to the data register from the input port and then move to W_SCL_L (Write, SCL Low state) state. The MSB bit is output on the SDA line. Then it moves to W_SCL_H. The l->h SCL transition means that the bit was written to slave. Then it increments bit counter and moves to W_SCL_L to transmit the next bit. This continues till counter becomes > 7.
+- There are 2 tracks, one for sending and one for receiving. 
+- There is a bit counter which counts from 0 to 7. 
+- For writing, 
+  1) We load the value to the data register from the input port
+  2) Move to ```W_SCL_L``` (Write, ```SCL``` Low state) state. The MSB bit is output on the ```SDA``` line. 
+  3) Then on next state command, it moves to ```W_SCL_H```. The l->h ```SCL``` transition means that the bit was written to slave.
+  4) On another next state command, it increments bit counter and moves to ```W_SCL_L``` to transmit the next bit.
+  5) This continues till counter becomes > 7. At that stage, it moves to the ```RACK_SCL_L``` (Read acknowledge, ```SCL``` low) state where it listens for an ```ACK``` from the slave
+  6) On next_state command, it moves to ```RACK_SCL_H``` and checks if ```SDA``` is low. If it is, acknowledge was received. Else, ACK was unsuccessfull. So, it outputs the signal, ```o_ackerror``` and moves to the ```STOP``` state next
+  7) On ```next_state``` command, it transitions to ```R_SCL_L``` if it is in read mode or to ```W_SCL_L``` if it is in write mode
 
-After counter completes, it goes to ACK states, where it listens for an ACK from the slave. If no ACK is received, it goes to stop condition and sends a stop signal.
 
-Reading is similar to writing, but we read the bit from SDA in R_SCL_H state and write it to the register.
+- Transitions from ```IDLE``` -> ```START```, ```RACK_SCL_H``` -> ```STOP``` (on no ACK received) and from any state to ```STOP``` are asynchronous with respect to ```i_next_state```. They can happen on an internal clock cycle.
 
-For the initial address/RW bit, we load the required byte to the register and start the write sequence. Then, depending on if the operation was a read or write, after the ACK, the read or write sequence is started again.
+Reading is similar to writing, but we read the bit from ```SDA``` in ```R_SCL_H``` state and write it to the register.
+
+For the initial address/RW bit, we load the required byte to the register and start the write sequence. Then, depending on if the operation was a read or write, after the ```ACK```, the read or write sequence is started again.
+
+#### Clock stretching
+
+For clock stretching, when SCL is high (in states ```s_W_SCL_HIGH```, ```s_R_SCL_HIGH```, ```s_RACK_SCL_HIGH```, ```s_WACK_SCL_HIGH```, ```s_STOP```), a check is made if SCL line is high or low. If it is low it means the slave is stretching the clock. So, we output a signal, ```o_clkstretched``` to indicate this and disable next state transition. As soon as the slave releases the clock, SCL goes high and ```o_clkstretched``` becomes 0 and we can transition to the next state.
+
+#### Arbitration
+
+Still figuring it out! Current idea :
+
+For other masters initiating transfers
+- Add a ```DISABLED``` state
+- In ```IDLE``` state, look out for a ```START``` condition (```SCL``` high, ```SDA``` low). If you get it, move to ```DISABLED ```state
+- In ```DISABLED``` state, look out for another master
+
+For other masters initiating transfers at same time we give a ```START```
+- We need to check on every output if actual output is what we expect.
+- On ```W_SCL_HIGH```, check if output is actually what we drive on the ```SDA``` line. If it not (we give a 1 and see 0), it means another master is sending a 0. Transition to the ```DISABLED``` state. So, the master with the first 0 in its address(the smaller one) wins.
 
 ---
 
 ## References
 
 - https://i2c.info/i2c-bus-specification
-- Official I2C documentation by NXP : https://www.nxp.com/docs/en/application-note/AN10216.pdf
+- Official I2C documentation by NXP : https://www.generationrobots.com/media/Capteur-MinIMU-9-v3/bus-I2C-UM10204-specification-user-manual.pdf
 - I2C state machine architecture : http://www.cs.columbia.edu/~cs4823/handouts/proj1-i2c-problem.pdf
-- 
