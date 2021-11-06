@@ -42,17 +42,18 @@ module fifo_tb;
 
     fifo #(.p_WORD_LEN(8), .p_FIFO_SIZE(8)) DUT (
         .i_clk(clk_in),
+        .i_reset(reset),
 
         .o_full(w_full),
         .o_empty(w_empty),
 
-        .enq_data(r_data_in),
-        .enq_en(r_enq_en),
-        .enq_rdy(w_enq_rdy),
+        .i_enq_data(r_data_in),
+        .i_enq_en(r_enq_en),
+        .o_enq_rdy(w_enq_rdy),
 
-        .deq_data(w_data_out),
-        .deq_en(r_deq_en),
-        .deq_rdy(w_deq_rdy)
+        .o_out_data(w_data_out),
+        .i_deq_en(r_deq_en),
+        .o_deq_rdy(w_deq_rdy)
     );
     
     localparam  DATA_LEN = 90;
@@ -67,6 +68,23 @@ module fifo_tb;
 
         reset   <= 1'b1;
         #1;
+        reset   <= 1'b0;
+
+        // Send data
+        for(i = 9; i >= 0; i = i - 1) @(negedge clk_in) begin
+            r_data_in         <= $random;
+            r_enq_en          <= 1'b1;
+        end
+        r_enq_en <= 1'b0;
+
+        for(i = 9; i >= 0; i = i - 1) @(negedge clk_in) begin
+            r_deq_en        <= 1'b1;
+        end
+        r_deq_en <= 1'b0;
+
+        @(negedge clk_in);
+        reset   <= 1'b1;
+        @(negedge clk_in);
         reset   <= 1'b0;
 
         // Send data

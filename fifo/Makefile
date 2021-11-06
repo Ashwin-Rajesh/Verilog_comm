@@ -37,6 +37,7 @@ data		=
 
 # Waveform file
 wave		= $(proj_name).vcd
+wave_save   = $(proj_name).gtkw
 
 compile: $(object)
 .PHONY: compile
@@ -48,7 +49,7 @@ $(wave): $(object) $(data)
 	./$(object)
 
 view: $(wave)
-	gtkwave $(wave)
+	gtkwave $(wave) $(wave_save)
 .PHONY: simulate
 
 run: $(object)
