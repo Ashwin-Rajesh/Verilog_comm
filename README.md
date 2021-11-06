@@ -1,14 +1,15 @@
 # Verilog_comm
 
-Implementation of common digital communication protocols in verilog, for use in FPGAs
+Common blocks for digital communication in verilog, meant for use in FPGAs
 
 ---
 
 # Index
 1) [UART (Universal Asynchronous Receiver/Transmitter)](uart/uart.md)
 2) [SPI (Serial Peripheral Interconnect)](spi/spi.md)
-3) [CRC (Cyclic redundancy check)](crc/crc.md)
-4) [I2C (Inter-IC)](i2c/i2c.md)
+3) [FIFO (First In First Out)](fifo/fifo.md)
+4) [CRC (Cyclic redundancy check)](crc/crc.md)
+5) [I2C (Inter-IC)](i2c/i2c.md)
 
 ---
 
