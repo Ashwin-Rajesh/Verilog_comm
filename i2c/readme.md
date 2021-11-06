@@ -6,6 +6,10 @@
 - ```SDA``` : Data
 - ```SCL``` : Clock
 - Signals are sampled on positive edge of SCL, and change on its negative edge
+- A wired-AND connection is used on the pins. An external pullup resistor is used for this. All masters and slaves output a high impedance state for output ```1``` and pull the pin to ground for output ```0```. The end result is that if any of the outputs pull the pin to ```0```, the whole line becomes ```0```, acting like and ```AND``` gate.
+- Multiple masters and multiple slaves can exist on the bus
+- Slaves can slow down the clock by keeping it low even when master releases it to high. Called "clock stretching"
+- Multiple masters need to arbitrate control over the bus
 
 #### Single master and single slave:
 ![](docs/i2c_ckt.drawio.svg)
@@ -36,7 +40,9 @@
 
 ## Finite state machine
 
-- The core of the I2C IP works using a finite state machine. This is its state transition diagram. It is a moore machine (almost). SDA and SCL depends on the state it is in, but SDA can also be dependent on address/data that is being sent.
+- The core of the I2C IP works using a finite state machine. This is its state transition diagram. It is a moore machine (almost). SCL depends on the state of the FSM, but SDA can also be dependent on address/data that is being sent 
+- Here, SDA dependent on data register is represented by an ```x```). 
+- Sometimes SDA level depends on another device on the bus. This is represented by a ```z```
 
 States
 
@@ -53,6 +59,7 @@ States
 | s_WACK_SCL_LOW  | 8      | Write ack   | 0   | 0   |
 | s_WACK_SCL_HIGH | 9      | Write ack   | 0   | 1   |
 | s_STOP          | 10     | Stop bit    | 0   | 1   |
+| s_DISABLED      | 11     | Another master | z| z   |
 
 - Start condition is on transition from ```s_IDLE``` to ```s_START```
 - Stop condition is on transition from ```s_STOP``` to ```s_IDLE```
@@ -70,6 +77,7 @@ States
   6) On next_state command, it moves to ```RACK_SCL_H``` and checks if ```SDA``` is low. If it is, acknowledge was received. Else, ACK was unsuccessfull. So, it outputs the signal, ```o_ackerror``` and moves to the ```STOP``` state next
   7) On ```next_state``` command, it transitions to ```R_SCL_L``` if it is in read mode or to ```W_SCL_L``` if it is in write mode
 
+- To send the address, R/W bit, after the start state, we load the address and R/W bit onto the data register and put the FSM into the write track. We also set the ```r_rw``` register that will determine if the master sends or receives after the first byte.
 
 - Transitions from ```IDLE``` -> ```START```, ```RACK_SCL_H``` -> ```STOP``` (on no ACK received) and from any state to ```STOP``` are asynchronous with respect to ```i_next_state```. They can happen on an internal clock cycle.
 
@@ -83,16 +91,14 @@ For clock stretching, when SCL is high (in states ```s_W_SCL_HIGH```, ```s_R_SCL
 
 #### Arbitration
 
-Still figuring it out! Current idea :
-
-For other masters initiating transfers
-- Add a ```DISABLED``` state
+For other masters initiating transfers when our master is ```IDLE```
+- We have a ```DISABLED``` state
 - In ```IDLE``` state, look out for a ```START``` condition (```SCL``` high, ```SDA``` low). If you get it, move to ```DISABLED ```state
-- In ```DISABLED``` state, look out for another master
+- In ```DISABLED``` state, look out for ```STOP``` condition on the bus. If found, transition to ```START``` condition
 
 For other masters initiating transfers at same time we give a ```START```
 - We need to check on every output if actual output is what we expect.
-- On ```W_SCL_HIGH```, check if output is actually what we drive on the ```SDA``` line. If it not (we give a 1 and see 0), it means another master is sending a 0. Transition to the ```DISABLED``` state. So, the master with the first 0 in its address(the smaller one) wins.
+- On ```W_SCL_HIGH```, check if output is actually what we drive on the ```SDA``` line. If it not (we give a 1 and see 0), it means another master is sending a 0. Transition to the ```DISABLED``` state. So, the master addressing the smaller address wins.
 
 ---
 

@@ -14,9 +14,10 @@ The property of XOR that it acts like a selective NOT gate is very useful here. 
 
 My circuit accomplishes this via the AND gate. When the polynomial coefficient is 0, the XOR gate gets 0 input, effectively making it a buffer. When the polynomial coefficient is 1, the last bit is fed to the XOR gates.
 
-Synthesis tools will be able to optimize the XOR and AND gates away and generate the optimized structure, since the polynomial is a parameter. If required, the polynomial can be a register to create a programmable peripheral device or accelerator.
+Synthesis tools will be able to optimize the XOR and AND gates away and generate the optimized structure, since the polynomial is a parameter. If required, the code can be modified to be a register to create a programmable peripheral device or accelerator.
 
 ---
+
 ## Todo
 - [ ] Option to set initial value of CRC register to something other than 0
 - [ ] Implement a version with optimized byte-wise computation

@@ -9,16 +9,16 @@ This is mostly a learning exercise for me, for practicing writing and verifying 
 ## Index
 
 #### Peripherals
-1) [UART master, slave](uart/uart.md) : Universal Asyncrhnronous Read/Transmit
-2) [SPI master, slave](spi/spi.md) : Serial Peripheral Interconnect
-3) [I2C master, slave](i2c/i2c.md) : Inter-Integrated Circuit
+1) [UART master, slave](uart/readme.md) : Universal Asyncrhnronous Read/Transmit
+2) [SPI master, slave](spi/readme.md) : Serial Peripheral Interconnect
+3) [I2C master, slave](i2c/readme.md) : Inter-Integrated Circuit
 
 #### Computation
-1) [CRC](crc/crc.md) : Cyclic Redundance Check
+1) [CRC](crc/readme.md) : Cyclic Redundance Check
 
 #### Memory
-1) [FIFO](fifo/fifo.md) : First In First Out
-2) [ROB](rob/rob.md) : Re-Order Buffer
+1) [FIFO](fifo/readme.md) : First In First Out
+2) [ROB](rob/readme.md) : Re-Order Buffer
 
 ---
 
