@@ -24,7 +24,7 @@
 proj_name 	= i2c
 
 # Source files used
-source 		= i2c_master.v i2c_slave.v tristate_port.v
+source 		= i2c_master.v i2c_slave.v tristate_port.v i2c_master_fsm.v
 
 # Testbench code
 testbench	= $(proj_name)_tb.v
@@ -38,19 +38,22 @@ data		=
 # Waveform file
 wave		= $(proj_name).vcd
 
-compile: $(object)
-.PHONY: compile
+i2c_master_fsm.out : i2c_master_fsm.v tristate_port.v i2c_master_fsm_tb.v
+	iverilog i2c_master_fsm_tb.v -o i2c_master_fsm.out
 
-$(object): $(source) $(testbench)
-	iverilog $(testbench) $(source) -o $(object)
+i2c_master_fsm.vcd : i2c_master_fsm.out
+	./i2c_master_fsm.out
 
-$(wave): $(object) $(data)
-	./$(object)
+fsm_test : i2c_master_fsm.vcd
+	gtkwave i2c_master_fsm.vcd i2c_master_fsm.gtkw 
+.PHONY: fsm_test
 
-view: $(wave)
-	gtkwave $(wave)
-.PHONY: simulate
+i2c_master_fsm_arb.out : i2c_master_fsm.v tristate_port.v i2c_master_fsm_tb_arb.v
+	iverilog i2c_master_fsm_tb_arb.v -o i2c_master_fsm_arb.out
 
-run: $(object)
-	./$(object)
-.PHONY:run
+i2c_master_fsm_arb.vcd : i2c_master_fsm_arb.out
+	./i2c_master_fsm_arb.out
+
+fsm_arb_test : i2c_master_fsm_arb.vcd
+	gtkwave i2c_master_fsm_arb.vcd i2c_master_fsm_arb.gtkw 
+.PHONY: fsm_test
