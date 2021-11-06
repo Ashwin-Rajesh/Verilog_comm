@@ -71,32 +71,61 @@ module fifo_tb;
         reset   <= 1'b0;
 
         // Send data
-        for(i = 9; i >= 0; i = i - 1) @(negedge clk_in) begin
+        while(w_enq_rdy) @(negedge clk_in) begin
             r_data_in         <= $random;
             r_enq_en          <= 1'b1;
         end
         r_enq_en <= 1'b0;
 
-        for(i = 9; i >= 0; i = i - 1) @(negedge clk_in) begin
-            r_deq_en        <= 1'b1;
-        end
+        // Get the data back
+        while(w_deq_rdy) @(negedge clk_in) begin
+            r_deq_en         <= 1'b1;
+        end 
         r_deq_en <= 1'b0;
 
+        // Send more data
+        while(w_enq_rdy) @(negedge clk_in) begin
+            r_data_in         <= $random;
+            r_enq_en          <= 1'b1;
+        end
+        r_enq_en <= 1'b0;
+
+        // Get some of the data back
+        for(i = 0; i < 3; i = i + 1) @(negedge clk_in) begin
+            r_deq_en         <= 1'b1;
+        end 
+        r_deq_en <= 1'b0;
+
+        // Send more data
+        while(w_enq_rdy) @(negedge clk_in) begin
+            r_data_in         <= $random;
+            r_enq_en          <= 1'b1;
+        end
+        r_enq_en <= 1'b0;
+
+        // Get the data back
+        while(w_deq_rdy) @(negedge clk_in) begin
+            r_deq_en         <= 1'b1;
+        end 
+        r_deq_en <= 1'b0;
+
+        // Reset
         @(negedge clk_in);
         reset   <= 1'b1;
         @(negedge clk_in);
         reset   <= 1'b0;
 
         // Send data
-        for(i = 9; i >= 0; i = i - 1) @(negedge clk_in) begin
+        while(w_enq_rdy) @(negedge clk_in) begin
             r_data_in         <= $random;
             r_enq_en          <= 1'b1;
         end
         r_enq_en <= 1'b0;
 
-        for(i = 9; i >= 0; i = i - 1) @(negedge clk_in) begin
-            r_deq_en        <= 1'b1;
-        end
+        // Get the data back
+        while(w_deq_rdy) @(negedge clk_in) begin
+            r_deq_en         <= 1'b1;
+        end 
         r_deq_en <= 1'b0;
 
         @(negedge clk_in)

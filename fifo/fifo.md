@@ -16,6 +16,7 @@
 | ```o_reset```     | Synchronous reset|
 | ```o_full```      | Is FIFO full? | 
 | ```o_empty```     | Is FIFO empty? |
+| ```o_len```       | Number of elements in the FIFO |
 | ```i_enq_data```  | Data to push to FIFO |
 | ```i_enq_en```    | Push to FIFO |
 | ```o_enq_rdy```   | Can i push to FIFO? (same as !o_full) |
