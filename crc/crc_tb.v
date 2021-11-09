@@ -36,11 +36,11 @@ module crc_tb;
     wire[CRC_LEN-1:0] crc_out;
 
     crc #(CRC_LEN, CRC_POLYNOMIAL) DUT (
-    .data_in(data_in),
-    .clk_in(clk_in),
-    .reset(reset),
-    .enable(enable),
-    .crc_out(crc_out)
+        .data_in(data_in),
+        .clk_in(clk_in),
+        .reset(reset),
+        .enable(enable),
+        .crc_out(crc_out)
     );
 
     localparam  DATA_LEN = 90;
